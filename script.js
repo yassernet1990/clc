@@ -4,6 +4,7 @@ function setLang(){arabic=!arabic;const apply=()=>{document.documentElement.lang
 if(localStorage.getItem('clc-language')==='ar')setLang();document.querySelector('.lang').onclick=setLang;
 const revealObserver=new IntersectionObserver(entries=>entries.forEach(x=>{if(x.isIntersecting){x.target.classList.add('show');revealObserver.unobserve(x.target)}}),{threshold:.14});document.querySelectorAll('.reveal').forEach(e=>revealObserver.observe(e));
 const sectionVideos=[...document.querySelectorAll('.service video,.digital video,.contact video')];
+const heroVideo=document.getElementById('heroVideo');if(heroVideo){heroVideo.muted=true;heroVideo.play().catch(()=>{})}
 const videoObserver=new IntersectionObserver(entries=>entries.forEach(x=>x.isIntersecting?x.target.play().catch(()=>{}):x.target.pause()),{rootMargin:'150px'});sectionVideos.forEach(v=>videoObserver.observe(v));
 addEventListener('scroll',()=>document.querySelector('.header').classList.toggle('scrolled',scrollY>24),{passive:true});document.getElementById('year').textContent=new Date().getFullYear();
 const dialog=document.querySelector('dialog');document.querySelectorAll('.open').forEach(b=>b.onclick=()=>dialog.showModal());document.querySelector('.close').onclick=()=>dialog.close();
