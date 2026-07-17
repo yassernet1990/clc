@@ -3,7 +3,37 @@ const original={};document.querySelectorAll('[data-t]').forEach(e=>original[e.da
 function setLang(){arabic=!arabic;const apply=()=>{document.documentElement.lang=arabic?'ar':'en';document.documentElement.dir=arabic?'rtl':'ltr';document.querySelectorAll('[data-t]').forEach(e=>e.textContent=arabic?(ar[e.dataset.t]||original[e.dataset.t]):original[e.dataset.t]);document.querySelector('.lang').textContent=arabic?'EN':'عربي';localStorage.setItem('clc-language',arabic?'ar':'en')};document.startViewTransition?document.startViewTransition(apply):apply()}
 if(localStorage.getItem('clc-language')==='ar')setLang();document.querySelector('.lang').onclick=setLang;
 const revealObserver=new IntersectionObserver(entries=>entries.forEach(x=>{if(x.isIntersecting){x.target.classList.add('show');revealObserver.unobserve(x.target)}}),{threshold:.14});document.querySelectorAll('.reveal').forEach(e=>revealObserver.observe(e));
-const videoObserver=new IntersectionObserver(entries=>entries.forEach(x=>x.isIntersecting?x.target.play().catch(()=>{}):x.target.pause()),{rootMargin:'150px'});document.querySelectorAll('video').forEach(v=>videoObserver.observe(v));
+
+// Stable video delivery: use the same Wikimedia WebM method proven on the CONS website.
+const stableVideos=[
+'https://commons.wikimedia.org/wiki/Special:Redirect/file/Men_at_work_in_building_site.webm',
+'https://commons.wikimedia.org/wiki/Special:Redirect/file/Road_Construction.webm'
+];
+document.querySelectorAll('video').forEach((video,index)=>{
+  video.muted=true;
+  video.autoplay=true;
+  video.loop=true;
+  video.playsInline=true;
+  video.preload='auto';
+  video.setAttribute('muted','');
+  video.setAttribute('autoplay','');
+  video.setAttribute('loop','');
+  video.setAttribute('playsinline','');
+  let source=video.querySelector('source');
+  if(!source){source=document.createElement('source');video.appendChild(source)}
+  source.src=stableVideos[index%stableVideos.length];
+  source.type='video/webm';
+  video.load();
+  const start=()=>video.play().catch(()=>{});
+  video.addEventListener('loadeddata',start,{once:true});
+  video.addEventListener('canplay',start);
+  video.addEventListener('error',()=>{video.classList.add('video-error')});
+  start();
+});
+
+const videoObserver=new IntersectionObserver(entries=>entries.forEach(x=>{if(x.isIntersecting){x.target.play().catch(()=>{})}else{x.target.pause()}}),{rootMargin:'200px 0px',threshold:.01});document.querySelectorAll('video').forEach(v=>videoObserver.observe(v));
+['click','touchstart','keydown'].forEach(eventName=>document.addEventListener(eventName,()=>document.querySelectorAll('video').forEach(v=>v.play().catch(()=>{})),{once:true,passive:true}));
+addEventListener('visibilitychange',()=>{if(!document.hidden)document.querySelectorAll('video').forEach(v=>v.play().catch(()=>{}))});
 addEventListener('scroll',()=>document.querySelector('.header').classList.toggle('scrolled',scrollY>24),{passive:true});document.getElementById('year').textContent=new Date().getFullYear();
 const dialog=document.querySelector('dialog');document.querySelectorAll('.open').forEach(b=>b.onclick=()=>dialog.showModal());document.querySelector('.close').onclick=()=>dialog.close();
 document.getElementById('form').onsubmit=e=>{e.preventDefault();const f=new FormData(e.target),s=encodeURIComponent('CLC project inquiry — '+f.get('company')),b=encodeURIComponent(`Name: ${f.get('name')}\nCompany: ${f.get('company')}\nEmail: ${f.get('email')}\n\nProject scope:\n${f.get('scope')}`);location.href=`mailto:projects@clc-company.com?subject=${s}&body=${b}`};
