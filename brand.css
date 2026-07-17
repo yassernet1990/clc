@@ -1,0 +1,30 @@
+.brand {
+  gap: 13px;
+  direction: ltr;
+}
+
+.brandLogo {
+  display: block;
+  width: 112px;
+  height: auto;
+}
+
+.brandTag {
+  max-width: 76px;
+  color: #d9e1e4;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.17em;
+}
+
+@media (max-width: 560px) {
+  .brandLogo {
+    width: 96px;
+  }
+
+  .brandTag {
+    max-width: 64px;
+    font-size: 7px;
+  }
+}
